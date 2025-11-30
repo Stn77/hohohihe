@@ -14,15 +14,59 @@ class _HomePageState extends State<HomePage> {
   final ApiService _apiService = ApiService();
   bool _isAbsenLoading = false;
 
+  // Dummy koordinat
   final String _dummyLatitude = "-6.200000";
   final String _dummyLongitude = "106.816666";
 
-  void _showSnackBar(String message, {Color color = Colors.teal}) {
+  // SnackBar untuk error
+  void _showSnackBar(String message, {Color color = Colors.red}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: color),
     );
   }
 
+  // Dialog sukses auto-close
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle, size: 80, color: Colors.blue),
+              const SizedBox(height: 12),
+              Text(
+                "Berhasil!",
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue.shade700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+    });
+  }
+
+  // Proses absen
   Future<void> _handleAbsen() async {
     setState(() => _isAbsenLoading = true);
 
@@ -38,19 +82,15 @@ class _HomePageState extends State<HomePage> {
       final isLate = data['is_late'] as String?;
       final jenis = isLate == 'Terlambat' ? 'Terlambat' : 'Tepat Waktu';
 
-      Color color = Colors.teal.shade700;
-      if (isLate == 'Terlambat') color = Colors.orange.shade700;
-      if (isLate == 'Tepat Waktu') color = Colors.green.shade700;
-
-      _showSnackBar(
+      _showSuccessDialog(
         '${result['message']}\nWaktu: ${data['waktu_absen']} ($jenis)',
-        color: color,
       );
     } else {
-      _showSnackBar(result?['error'] ?? 'Absen gagal.', color: Colors.red.shade700);
+      _showSnackBar(result?['error'] ?? 'Absen gagal.');
     }
   }
 
+  // Logout
   Future<void> _handleLogout() async {
     await _apiService.logout();
     Navigator.pushAndRemoveUntil(
@@ -69,7 +109,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Halaman Absensi'),
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.blue.shade700,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -84,6 +124,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Kartu Informasi Waktu
               Card(
                 elevation: 4,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -91,7 +132,7 @@ class _HomePageState extends State<HomePage> {
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     children: [
-                      const Text('Waktu Saat Ini', style: TextStyle(fontSize: 18, color: Colors.teal)),
+                      const Text('Waktu Saat Ini', style: TextStyle(fontSize: 18, color: Colors.blue)),
                       const SizedBox(height: 8),
                       Text(dateDisplay, style: const TextStyle(fontSize: 16)),
                       const SizedBox(height: 4),
@@ -100,7 +141,7 @@ class _HomePageState extends State<HomePage> {
                         style: const TextStyle(
                           fontSize: 36,
                           fontWeight: FontWeight.bold,
-                          color: Colors.teal,
+                          color: Colors.blue,
                         ),
                       ),
                     ],
@@ -109,6 +150,7 @@ class _HomePageState extends State<HomePage> {
               ),
 
               const SizedBox(height: 40),
+
               const Text(
                 "Tekan tombol di bawah untuk melakukan Absensi (Masuk atau Pulang).",
                 textAlign: TextAlign.center,
@@ -116,12 +158,14 @@ class _HomePageState extends State<HomePage> {
               ),
 
               const SizedBox(height: 20),
+
+              // Tombol Absen
               _isAbsenLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                       onPressed: _handleAbsen,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.pink.shade600,
+                        backgroundColor: Colors.blue.shade700,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -133,6 +177,8 @@ class _HomePageState extends State<HomePage> {
                     ),
 
               const SizedBox(height: 40),
+
+              // Debug lokasi
               Text(
                 'Lokasi Dummy:\nLat: $_dummyLatitude\nLong: $_dummyLongitude',
                 textAlign: TextAlign.center,
