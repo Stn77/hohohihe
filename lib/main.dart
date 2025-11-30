@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'pages/login_page.dart';
-import 'pages/home_page.dart';
-import 'wrapper/auth_wrapper.dart';
+import 'package:siswa_absen/splashscreen.dart';
+// import 'pages/login_page.dart';
+// import 'pages/home_page.dart';
+// import 'wrapper/auth_wrapper.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
         Locale('en', 'US'),
         Locale('id', 'ID'),
       ],
-      home: const AuthWrapper(),
+      home: const SplashPage(),
     );
   }
 }
